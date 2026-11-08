@@ -44,14 +44,28 @@ alias rg='rg -i'
 alias fd='fd -H'
 
 # fzf n stuff
-alias catz='cat $(fzf)'
+
+# Last successful fzf selection, reusable later, e.g.:
+#   cd "$(dirname "$FZF_LASTOUT")"
+typeset -g FZF_LASTOUT=""
+
+function catz() {
+    local file
+    file=$(fzf) || return 0
+    typeset -g FZF_LASTOUT="$file"
+    cat "$file"
+}
 
 function cdz() {
-    cd $(fd --type d -H | fzf)
+    local dir
+    dir=$(fd --type d -H | fzf) || return 0
+    typeset -g FZF_LASTOUT="$dir"
+    cd "$dir"
 }
 
 function vimz() {
     # -h flag to search files in your current directory
+    local file
     if [[ $# -gt 0 && $1 == '-h' ]]; then
         file=$(find . 2> /dev/null | fzf)
     else
@@ -59,8 +73,8 @@ function vimz() {
     fi
     if [[ $? != 0 ]]; then
         return 0
-    else
-        vim $file
     fi
+    typeset -g FZF_LASTOUT="$file"
+    vim "$file"
 }
 
