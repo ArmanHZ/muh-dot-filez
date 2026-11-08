@@ -13,6 +13,12 @@ function mkdircd() {
     mkdir -p "$1" && cd "$1"
 }
 
+# I mean... this could be done with `mktemp -d` and templates, but what the hell.
+function mkdirtemp() {
+    dir_name=$(uuidgen | awk '{split($0,arr,"-"); print arr[1] arr[5]}')
+    mkdircd /tmp/$dir_name
+}
+
 # Colored and line number grep
 alias grep='grep -n --color=auto'
 
@@ -28,8 +34,24 @@ alias ip='ip --color=auto'
 # Colored diff
 alias diff='diff --color=auto'
 
-# fzf + vim
-vif() {
+# batcat
+alias cat='bat -pp'
+
+# rg
+alias rg='rg -i'
+
+# fd
+alias fd='fd -H'
+
+# fzf n stuff
+alias catz='cat $(fzf)'
+
+function cdz() {
+    cd $(fd --type d -H | fzf)
+}
+
+function vimz() {
+    # -h flag to search files in your current directory
     if [[ $# -gt 0 && $1 == '-h' ]]; then
         file=$(find . 2> /dev/null | fzf)
     else
